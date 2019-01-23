@@ -17,6 +17,8 @@ IBE can derive child public key from master public key without knowing master/ch
 
 #### Derive Private Key with Master Private Key
 
+### Specification: Key derivation
+
 ### Licence
 
 MIT
