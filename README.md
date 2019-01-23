@@ -5,7 +5,13 @@ Generate Child Keys from Master Keys and ASCII string.
 
 ### What IBE do in Bitcoin
 
-With IBE, you are allowed to use Public/Private Key like "coffee@[Key]", or "Version1@/home/fileA@[FileSystemKey]", or "Jack@[BitMail Key]"
+With IBE, you are allowed to use Public/Private Key like 
+
+~~~
+coffee@[Key]
+Version1@/home/fileA@[FileSystemKey]
+Jack@[BitMail Key]
+~~~
 
 IBE can derive child public key from master public key without knowing master/child private key, while IBE derive coordinated child private key with master private key, with same ASCII string.
 
