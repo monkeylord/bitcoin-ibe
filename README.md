@@ -39,7 +39,7 @@ var bsv = require("bsv");
 
 var parentPrivateKey = new bsv.PrivateKey();
 //<PrivateKey: 93bfa48ea502c4e52d471bb59704162f35dcfa48822c6af81ff94de9567496ec, network: livenet>
-var parentPublicKey = ParentPrivateKey.toPublicKey();
+var parentPublicKey = parentPrivateKey.toPublicKey();
 //<PublicKey: 02033cf62f21f8cf870c310588de1ac018c042e329cd89b05cbb3cee0761fb5ee2>
 ~~~
 
