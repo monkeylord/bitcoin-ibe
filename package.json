@@ -1,0 +1,33 @@
+{
+  "name": "bitcoin-ibe",
+  "version": "1.0.0",
+  "description": "Bitcoin ID-Based Encryption",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/monkeylord/bitcoin-ibe.git"
+  },
+  "keywords": [
+    "bitcoin",
+    "IBE",
+    "IBC",
+    "ECC"
+  ],
+  "author": "Monkeylord",
+  "license": "MIT",
+  "unpkg": "ibe.js",
+  "bugs": {
+    "url": "https://github.com/monkeylord/bitcoin-ibe/issues"
+  },
+  "homepage": "https://github.com/monkeylord/bitcoin-ibe#readme",
+  "dependencies": {
+    "bsv": "^0.21.7"
+  },
+  "devDependencies": {
+    "webpack-cli": "^3.2.1"
+  }
+}
