@@ -1,6 +1,6 @@
 {
   "name": "bitcoin-ibe",
-  "version": "1.0.0",
+  "version": "1.0.4",
   "description": "Bitcoin ID-Based Encryption",
   "main": "index.js",
   "scripts": {
@@ -24,9 +24,6 @@
     "url": "https://github.com/monkeylord/bitcoin-ibe/issues"
   },
   "homepage": "https://github.com/monkeylord/bitcoin-ibe#readme",
-  "dependencies": {
-    "bsv": "^0.21.7"
-  },
   "devDependencies": {
     "webpack-cli": "^3.2.1"
   }
