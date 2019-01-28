@@ -15,7 +15,8 @@
     "bitcoin",
     "IBE",
     "IBC",
-    "ECC"
+    "ECC",
+    "BSV"
   ],
   "author": "Monkeylord",
   "license": "MIT",
@@ -24,7 +25,6 @@
     "url": "https://github.com/monkeylord/bitcoin-ibe/issues"
   },
   "homepage": "https://github.com/monkeylord/bitcoin-ibe#readme",
-  "devDependencies": {
-    "webpack-cli": "^3.2.1"
-  }
+  "devDependencies": {},
+  "dependencies": {}
 }
