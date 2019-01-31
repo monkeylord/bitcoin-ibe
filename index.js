@@ -11,7 +11,7 @@ function CDKpriv(privateKey,id){
     var pubkey = privKey.toPublicKey();
     var hash = Hash.sha512hmac(new Buffer(id),new Buffer(pubkey.toString()));
     var leftpart = BN.fromBuffer(hash.slice(0, 32));
-    var newPrivateKey = leftpart.add(privKey.bn).umod(Point.getN()).toBuffer({size: 32});
+    var newPrivateKey = leftpart.mul(privKey.bn).umod(Point.getN()).toBuffer({size: 32});
     if(!PrivateKey.isValid(newPrivateKey)){
         return CDKpriv(privateKey,Buffer.concat([idbuf,new Buffer('\0')]));
     }
@@ -24,7 +24,7 @@ function CDKpub(publicKey,id){
     var leftpart = BN.fromBuffer(hash.slice(0, 32));
     //OR if(PublicKey.isValid(Point.getG().mul(leftpart).add(pubkey.point)))
     try {
-        var newpublicKey = PublicKey.fromPoint(Point.getG().mul(leftpart).add(pubkey.point));
+        var newpublicKey = PublicKey.fromPoint(pubkey.point.mul(leftpart));
     } catch (e) {
         return CDKpub(publicKey,Buffer.concat([idbuf,new Buffer('\0')]));
     }
