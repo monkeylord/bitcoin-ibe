@@ -82,7 +82,7 @@ The IBE Child Public Key is derived in following step:
 1. ID and PublicKey are serialized.
 2. Let I = HMAC-SHA512(serialized_PublicKey, serialized_id).
 3. Let BN = big number parsed from first 32 bytes of I.
-4. The returned public key = point(BN) + PublicKey 
+4. The returned public key = PublicKeyfromPoint(PublicKey * BN)
 5. In case returned public key is invalid, one should append 0x00 to serialized_id and proceed again.
 
 #### Derive Private Key with Parent Private Key
@@ -93,7 +93,7 @@ The IBE Child Private Key is derived in following step:
 2. ID and PublicKey are serialized.
 3. Let I = HMAC-SHA512(serialized_PublicKey, serialized_id).
 4. Let BN = big number parsed from first 32 bytes of I.
-5. The returned private key = (BN + PrivateKey) mod N
+5. The returned private key = (BN * PrivateKey) mod N
 6. In case returned private key is invalid, one should append 0x00 to serialized_id and proceed again.
 
 #### IBE Key URI
@@ -119,6 +119,10 @@ Thus, the character '@' is preserved and should not be used in ASCII_String.
 The '@' character in URI should be escaped to %40.
 
 A URLEncoding of ASCII_String is also recommanded.
+
+### Security
+
+The parent keys are protected under Diffie-Hellman secert exchanges. ID with extra data are hashed to big integer, and play as private key. Let p=parent_privatekey, let n=ID-generatedInteger, N,G is from Elliptic curve.  Public Key of p is P=pG. Child private key is (m*n) mod N. Child public key is mnG (which is (mn mod P)G).
 
 ### Licence
 
