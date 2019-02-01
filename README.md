@@ -3,7 +3,7 @@ Bitcoin ID-Based Encryption
 
 Derive Child Keys from Parent Keys and ASCII string.
 
-It's not standard IBE, but very useful in child key deriving.
+It's not exactly the IBE, but is IBE-like and useful in child key deriving.
 
 ### What IBE do in Bitcoin
 
@@ -20,6 +20,27 @@ or
 ~~~
 
 Bitcoin-IBE can derive child public key from parent public key without knowing parent/child private key, while Bitcoin-IBE derive coordinated child private key with master private key, with same ASCII string.
+
+#### Anonymous Transaction
+
+Bitcoin-IBE enable anonymous transactions
+
+For example, if Alice want to send some transactions to Bob(real person or a filesystem).
+
+Alice knows Bob's Public Key, but not Bob's private key.
+Alice want to send a transaction to Bob, but don't want Bob revealing his public key to unlock it.
+
+> 1. Alice use Id agreed with Bob.
+> 2. Alice derive a child public key from Bob's Public Key and Id.
+> 3. Alice send transaction to address associated with child public key.
+> 4. Bob derive child private key from Bob's Private Key and same Id used by Alice.
+> 5. Bob locate and unlock transaction send by Alice by child private key.
+>
+
+As Bob's Public Key is never revealed, Alice can send multiple transactions to different child Public Key address which can only be located by Bob. As an observer without Bob's Public Key, Carol won't know whom the transactions are sent to, nor who unlocks the transactions. 
+
+Bob's public key can be used multiple times by Alice, while Bob can unlock transactions.
+
 
 ### Install
 
@@ -161,9 +182,15 @@ While the paired child private is
 
 > pq % N
 
-Retrieving p from *pq % N* and *q* is very hard. Information of p is lost in *pq % N* , so it need a 2^256 brute-force to retrieve p.
+Retrieving p from *pq % N* and *q* is very hard. It may be Phi-hiding assumption used in RSA. 
 
-Retrieving *pG* from *(pq % N)G* is very hard too.
+However, security level may not be more than RSA-512 if an attack know both child private key and Id. So it's not adviced to reveal any of your private keys with Id. 
+
+Retrieving *pG* from *(pq % N)G* is similar to retrieving G from qG, should be very hard.
+
+Thus, don't play as PKG when using this method. 
+
+You should only use this method to generate private keys for yourself, and to let other people generate child public keys from your public key and Id.
 
 ### Licence
 
