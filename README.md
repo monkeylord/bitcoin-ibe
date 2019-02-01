@@ -3,17 +3,23 @@ Bitcoin ID-Based Encryption
 
 Derive Child Keys from Parent Keys and ASCII string.
 
+It's not standard IBE, but very useful in child key deriving.
+
 ### What IBE do in Bitcoin
 
-With IBE, you are allowed to use Public/Private Key like 
+With Bitcoin-IBE, you are allowed to use Public/Private Key like 
 
 ~~~
 coffee@[Key]
 Version1@/home/fileA@[FileSystemKey]
 Jack@[BitMail Key]
+
+or
+
+[Key]/coffee
 ~~~
 
-IBE can derive child public key from master public key without knowing master/child private key, while IBE derive coordinated child private key with master private key, with same ASCII string.
+Bitcoin-IBE can derive child public key from parent public key without knowing parent/child private key, while Bitcoin-IBE derive coordinated child private key with master private key, with same ASCII string.
 
 ### Install
 
@@ -71,19 +77,15 @@ cPrivateKey.toPublicKey()
 
 ### Specification: Key Derivation
 
-IBE Key Derivation is similar to BIP 32, and based on same elliptic curve feature.
-
-Thus, IBE Key Derivation should follow BIP32's approach, which will reduce complexity.
+Bitcoin IBE Key Derivation is a variant of ECDH, where ID-generated shared secret play as child PublicKey.
 
 #### Derive Public Key with Parent Public Key
 
 The IBE Child Public Key is derived in following step:
 
 1. ID and PublicKey are serialized.
-2. Let I = HMAC-SHA512(serialized_PublicKey, serialized_id).
-3. Let BN = big number parsed from first 32 bytes of I.
-4. The returned public key = PublicKeyfromPoint(PublicKey * BN)
-5. In case returned public key is invalid, one should append 0x00 to serialized_id and proceed again.
+2. Let BN = HMAC-SHA256(serialized_PublicKey, serialized_id).
+3. The returned public key = PublicKey.fromPoint(PublicKey * BN)
 
 #### Derive Private Key with Parent Private Key
 
@@ -91,17 +93,42 @@ The IBE Child Private Key is derived in following step:
 
 1. Get PublicKey from PrivateKey.
 2. ID and PublicKey are serialized.
-3. Let I = HMAC-SHA512(serialized_PublicKey, serialized_id).
-4. Let BN = big number parsed from first 32 bytes of I.
-5. The returned private key = (BN * PrivateKey) mod N
-6. In case returned private key is invalid, one should append 0x00 to serialized_id and proceed again.
+3. Let BN = HMAC-SHA512(serialized_PublicKey, serialized_id).
+4. The returned private key = (BN * PrivateKey) mod N
+
+#### Demo
+
+~~~javascript
+var bsv = require('bsv')
+
+var bob = bsv.PrivateKey()
+var bobPubkey = bob.publicKey
+var Id = "buy coffee"
+
+var nbuf = bsv.crypto.Hash.sha256hmac(bobPubkey.toBuffer(),Buffer.from('Id'))
+var n = bsv.crypto.BN.fromBuffer(nbuf)
+console.log("n is calculated from ID and public key")
+
+var pubkeyPoint = bobPubkey.point.mul(n)
+var bobcoffeePublicKey = bsv.PublicKey.fromPoint(pubkeyPoint)
+console.log("That's the address alice should sent money to: " + bobcoffeePublicKey.toAddress())
+
+var privateBN = bob.bn.mul(n).umod(bsv.crypto.Point.getN())
+var bobcoffeePrivateKey = bsv.PrivateKey(privateBN)
+console.log("Derived from bob private key and Id:" + bobcoffeePrivateKey.publicKey)
+console.log("Derived from bob public key and Id without knowing bob private key:" + bobcoffeePublicKey)
+console.log("Bob can take the money now.")
+
+~~~
 
 #### IBE Key URI
 
-The IBE should be specified as 
+The Bitcoin IBE should be specified as 
 
 ~~~
 [ASCII_String]@[ParentKey]
+or
+[ParentKey]/[ASCII_String]
 ~~~
 
 ParentKey can be Public Key or Private Key.
@@ -116,13 +143,27 @@ The derived key is also can be used as ParentKey, the following URI is allowed
 
 Thus, the character '@' is preserved and should not be used in ASCII_String.
 
-The '@' character in URI should be escaped to %40.
+The character '@' and '/' in URI should be escaped.
 
 A URLEncoding of ASCII_String is also recommanded.
 
 ### Security
 
-The parent keys are protected under Diffie-Hellman secert exchanges. ID with extra data are hashed to big integer, and play as private key. Let p=parent_privatekey, let n=ID-generatedInteger, N,G is from Elliptic curve.  Public Key of p is P=pG. Child private key is (m*n) mod N. Child public key is mnG (which is (mn mod P)G).
+Let parent private key be *p* , then parent public key is pG.
+
+Let *q* be hashed ASCII string.
+
+The child public key derived is exactly the shared secret in ECDH. Which is 
+
+> qpG = pqG = (pq % N)G
+
+While the paired child private is
+
+> pq % N
+
+Retrieving p from *pq % N* and *q* is very hard. Information of p is lost in *pq % N* , so it need a 2^256 brute-force to retrieve p.
+
+Retrieving *pG* from *(pq % N)G* is very hard too.
 
 ### Licence
 

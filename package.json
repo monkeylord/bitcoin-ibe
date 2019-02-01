@@ -1,10 +1,10 @@
 {
   "name": "bitcoin-ibe",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "description": "Bitcoin ID-Based Encryption",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha",
     "build": "webpack"
   },
   "repository": {
@@ -26,7 +26,10 @@
   },
   "homepage": "https://github.com/monkeylord/bitcoin-ibe#readme",
   "dependencies": {
-    "bsv": "^0.23.0"
+    "bsv": "^0.23.0",
+    "mocha": "^5.2.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "chai": "^4.2.0"
+  }
 }

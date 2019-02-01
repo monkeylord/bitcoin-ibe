@@ -1,36 +1,40 @@
-var bsv = require('bsv');
-var PrivateKey = bsv.PrivateKey;
-var PublicKey = bsv.PublicKey;
-var Hash = bsv.crypto.Hash;
-var BN = bsv.crypto.BN;
-var Point = bsv.crypto.Point;
+var bsv = require('bsv')
+var PrivateKey = bsv.PrivateKey
+var PublicKey = bsv.PublicKey
+var Hash = bsv.crypto.Hash
+var BN = bsv.crypto.BN
+var Point = bsv.crypto.Point
 
-function CDKpriv(privateKey,id){
-    var privKey = PrivateKey(privateKey)
-    var idbuf = new Buffer(id);
-    var pubkey = privKey.toPublicKey();
-    var hash = Hash.sha512hmac(new Buffer(id),new Buffer(pubkey.toString()));
-    var leftpart = BN.fromBuffer(hash.slice(0, 32));
-    var newPrivateKey = leftpart.mul(privKey.bn).umod(Point.getN()).toBuffer({size: 32});
-    if(!PrivateKey.isValid(newPrivateKey)){
-        return CDKpriv(privateKey,Buffer.concat([idbuf,new Buffer('\0')]));
-    }
-    return new PrivateKey(new BN(newPrivateKey));
+function CKDpriv (privateKey, id) {
+  var nbuf = Hash.sha256hmac(privateKey.publicKey.toBuffer(), Buffer.from(id))
+  var n = BN.fromBuffer(nbuf)
+  var childPrivkeyBN = privateKey.bn.mul(n).umod(Point.getN())
+  return PrivateKey(childPrivkeyBN)
 }
-function CDKpub(publicKey,id){
-    var idbuf = new Buffer(id);
-    var pubkey = PublicKey(publicKey);
-    var hash = Hash.sha512hmac(new Buffer(id),new Buffer(pubkey.toString()));
-    var leftpart = BN.fromBuffer(hash.slice(0, 32));
-    //OR if(PublicKey.isValid(Point.getG().mul(leftpart).add(pubkey.point)))
-    try {
-        var newpublicKey = PublicKey.fromPoint(pubkey.point.mul(leftpart));
-    } catch (e) {
-        return CDKpub(publicKey,Buffer.concat([idbuf,new Buffer('\0')]));
-    }
-    return newpublicKey;
+
+function CKDpub (publicKey, id) {
+  var nbuf = Hash.sha256hmac(publicKey.toBuffer(), Buffer.from(id))
+  var n = BN.fromBuffer(nbuf)
+  var childPubkeyPoint = publicKey.point.mul(n)
+  return PublicKey.fromPoint(childPubkeyPoint)
 }
+
+function childKey (key, id){
+  if(PrivateKey.isValid(key))return CKDpriv(key, id)
+  if(PublicKey.isValid(key))return CKDpub(key, id)
+  return null;
+}
+
+PrivateKey.prototype.childKey = function (Id) {
+  return CKDpriv(this, Id)
+}
+
+PublicKey.prototype.childKey = function (Id) {
+  return CKDpub(this, Id)
+}
+
 module.exports = {
-  CDKpriv: CDKpriv,
-  CDKpub: CDKpub
+  CKDpriv: CKDpriv,
+  CKDpub: CKDpub,
+  childKey: childKey
 }
