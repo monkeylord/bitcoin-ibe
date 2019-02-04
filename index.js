@@ -6,6 +6,7 @@ var BN = bsv.crypto.BN
 var Point = bsv.crypto.Point
 
 function CKDpriv (privateKey, id) {
+  privateKey = PrivateKey(privateKey)
   var nbuf = Hash.sha256hmac(privateKey.publicKey.toBuffer(), Buffer.from(id))
   var n = BN.fromBuffer(nbuf)
   var childPrivkeyBN = privateKey.bn.mul(n).umod(Point.getN())
@@ -13,6 +14,7 @@ function CKDpriv (privateKey, id) {
 }
 
 function CKDpub (publicKey, id) {
+  publicKey = PublicKey(publicKey)
   var nbuf = Hash.sha256hmac(publicKey.toBuffer(), Buffer.from(id))
   var n = BN.fromBuffer(nbuf)
   var childPubkeyPoint = publicKey.point.mul(n)
