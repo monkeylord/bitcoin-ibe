@@ -1,3 +1,4 @@
+# SECURITY CONCERN: KEY DERIVING IS REVERSABLE, SHOULD NOT EXPOSE ANY OF YOUR PRIVATE KEY
 # Bitcoin-IBE
 Bitcoin ID-Based Encryption
 
@@ -168,32 +169,7 @@ A URLEncoding of ASCII_String is also recommanded.
 
 ### Security
 
-Let *k* be parent private key, then *K* is parent public key. K=kG
 
-Let *Hash* be hashed ASCII string. Which is deterministic from the ASCII string.
-
-let *c* be child private key, then *C* is child public key. C=cG
-
-The child public key derived is exactly the shared secret in ECDH. 
-
-Child private key is calculated:
-
-> c ≡ Hash * k (mod n)
-
-Child public key is calculated:
-
-> C = Hash*kG = (Hash * k (mod n))G = cG
-
-Retrieving *k* from *c* and *Hash* is very hard. Difficulty at same level with ECDSA.
-
-Here's the proof:
-
-> In ECDSA:    s≡r - Hash * k (mod n)
-> In BitcoinIBE:    c≡Hash * k (mod n)
-
-If *k* can be retrieved from *c* and *Hash*, then *k* can be retrieved from *s* , *r* , *Hash* .
-
-Retrieving *K* from *C* and *Hash* is similar to retrieving G from kG, which is very hard, too.
 
 ### Licence
 
