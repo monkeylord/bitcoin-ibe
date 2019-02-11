@@ -8,7 +8,9 @@ It's not exactly the IBE, but is IBE-like and useful in child key deriving.
 
 ### What IBE do in Bitcoin
 
-With Bitcoin-IBE, you are allowed to use Public/Private Key like 
+#### Child Key Deriving
+
+With Bitcoin-IBE, you are allowed to use Child Public/Private Key like 
 
 ~~~
 coffee@[Key]
@@ -21,6 +23,16 @@ or
 ~~~
 
 Bitcoin-IBE can derive child public key from parent public key without knowing parent/child private key, while Bitcoin-IBE derive coordinated child private key with master private key, with same ASCII string.
+
+NOTE: It's an IBE-like method, but not as secure as IBE. Child Private Key Deriving is reversible if others know Father Public Key, Child Private Key and ID. You should keep all private keys secret and never expose any of them. (or keep ID secret)
+
+#### ID-Based Encryption on secp256k1
+
+A real IBE JS implement, with which you can play as PKG.
+
+Though an IBE-PrivateKey cannot be used as bitcoin address, it's good for encryption/decryption.
+
+Still building.
 
 #### Anonymous Transaction
 
@@ -97,11 +109,11 @@ childPrivateKey.toPublicKey()
 
 ### Specification: Key Derivation
 
-Bitcoin IBE Key Derivation is a variant of ECDH/ECDSA, where ID-generated shared secret play as child PublicKey.
+Bitcoin IBE Key Derivation is a variant of ECDH, where ID-generated shared secret play as child PublicKey.
 
 #### Derive Public Key with Parent Public Key
 
-The IBE Child Public Key is derived in following step:
+The IBE-like Child Public Key is derived in following step:
 
 1. ID and PublicKey are serialized.
 2. Let BN = HMAC-SHA256(serialized_PublicKey, serialized_id).
@@ -109,7 +121,7 @@ The IBE Child Public Key is derived in following step:
 
 #### Derive Private Key with Parent Private Key
 
-The IBE Child Private Key is derived in following step:
+The IBE-like Child Private Key is derived in following step:
 
 1. Get PublicKey from PrivateKey.
 2. ID and PublicKey are serialized.
@@ -143,7 +155,7 @@ console.log("Bob can take the money now.")
 
 #### IBE Key URI
 
-The Bitcoin IBE should be specified as 
+The Bitcoin IBE child key should be specified as 
 
 ~~~
 [ASCII_String]@[ParentKey]
