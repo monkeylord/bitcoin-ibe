@@ -60,10 +60,10 @@ With help of ECIES, anonymous communication is enabled.
 
 Alice knows Bob's Identity Public Key(IPK), which is used in ECIES, and never used to sign.
 
-> Alice generate a alice session key, then send alice session public key to Bob's IPK address, encrypted with ECIES.
-> Bob decrypt the session public key, and derive multiple child public keys (from child key '1' to 'n') from it as communication address.
-> Bob generate a bob session key, then send Bob session public key to alice_session_public_key.childKey('0').address, encrypted with ECIES.
-> Now both Alice and Bob can send messages to each other, without revealing who the messages are sending to.
+> 1. Alice generate a alice session key, then send alice session public key to Bob's IPK address, encrypted with ECIES.
+> 2. Bob decrypt the session public key, and derive multiple child public keys (from child key '1' to 'n') from it as communication address.
+> 3. Bob generate a bob session key, then send Bob session public key to alice_session_public_key.childKey('0').address, encrypted with ECIES.
+> 4. Now both Alice and Bob can send messages to each other, without revealing who the messages are sending to.
 
 Alice can also negociate sessions with Bob_IPK.childKey('Secret only shared between Alice and Bob'), which initiate hidden session.
 
@@ -75,10 +75,10 @@ Besides, public key can be extracted from ECDSA signature, which will reveal sig
 
 So if you want to post something on chain publicly with your signature, it's safer to use a certificate which enable you with non-ECDSA signature.
 
-> You have an Indentity Key.
-> You sign a certificate with it, and public it(or it's signature) on chain with the Indentity Public Key(IPK).
-> You sign a message(a blog maybe) with certificate, and post the message and signature to IPK.childKey('Shared Secret like "blog"').childKey('1').address
-> Now anyone who knows the 'Shared Secret' and your certificate can locate your message and verify it.
+> 1. You have an Indentity Key.
+> 2. You sign a certificate with it, and public it(or it's signature) on chain with the Indentity Public Key(IPK).
+> 3. You sign a message(a blog maybe) with certificate, and post the message and signature to IPK.childKey('Shared Secret like "blog"').childKey('1').address
+> 4. Now anyone who knows the 'Shared Secret' and your certificate can locate your message and verify it.
 
 As you only sign once, there won't be reusing problem.
 
@@ -88,10 +88,10 @@ In this scenerio, your public keys on blockchain are used as address, and addres
 
 Just the same with `Public Indentity with Certificate`, but certificate is replaced with public parameters of pairing-based IBE.
 
-> You have an Indentity Key.
-> You sign a set of public parameters with Indentity Key, and public it on chain with the Indentity Public Key(IPK).
-> You sign a message(a blog maybe) with IBEKEY('Shared Secret like "blog"'||'1'), and post the message and signature to IPK.childKey('Shared Secret like "blog"').childKey('1').address
-> Now anyone who knows the 'Shared Secret' can locate your message and verify it.
+> 1. You have an Indentity Key.
+> 2. You sign a set of public parameters with Indentity Key, and public it on chain with the Indentity Public Key(IPK).
+> 3. You sign a message(a blog maybe) with IBEKEY('Shared Secret like "blog"'||'1'), and post the message and signature to IPK.childKey('Shared Secret like "blog"').childKey('1').address
+> 4. Now anyone who knows the 'Shared Secret' can locate your message and verify it.
 
 In this scenerio, you are actually playing PKG(for youself in this case), it's possible to use all IBE tricks, while child key derivation provide addresses for the same ID.
 
@@ -131,6 +131,10 @@ var ibe = require("bitcoin-ibe");
 var id = "Some_ASCII_String";
 var childPublicKey = ibe.CKDpub(parentPublicKey,id);
 //<PublicKey: 03f9b7bd8cde33f80acbfa49c7d133fe2901450fe5a97ac505c816ae6ee1dd6be1>
+
+//Or use integrated way.
+var childPublicKey = parentPublicKey.childKey(id);
+
 ~~~
 
 #### Derive Private Key with Parent Private Key
@@ -141,6 +145,9 @@ var ibe = require("bitcoin-ibe");
 var id = "Some_ASCII_String";
 var childPrivateKey = ibe.CKDpriv(parentPrivateKey,id);
 //<PrivateKey: 38cd7085f4d645ec5655b3af75f022619abfcba4e96b231fca7ea907f5586aa7, network: livenet>
+
+//Or use integrated way.
+var childPrivateKey = parentPrivateKey.childKey(id);
 
 //The Derived child Private/Public Key are also pair.
 childPrivateKey.toPublicKey()
