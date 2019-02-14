@@ -14,12 +14,12 @@ With Bitcoin-IBE, you are allowed to use Child Public/Private Key like
 
 ~~~
 coffee@[Key]
-Version1@[FileSystemKey]/home/fileA
 Jack@[BitMail Key]
+[Key]/coffee
 
 or
 
-[Key]/coffee
+Version1@([FileSystemKey]/home/fileA)
 ~~~
 
 Bitcoin-IBE can derive child public key from parent public key without knowing parent/child private key, while Bitcoin-IBE derive coordinated child private key with master private key, with same ASCII string.
