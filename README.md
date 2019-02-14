@@ -14,7 +14,7 @@ With Bitcoin-IBE, you are allowed to use Child Public/Private Key like
 
 ~~~
 coffee@[Key]
-Version1@/home/fileA@[FileSystemKey]
+Version1@[FileSystemKey]/home/fileA
 Jack@[BitMail Key]
 
 or
