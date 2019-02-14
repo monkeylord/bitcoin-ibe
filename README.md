@@ -24,7 +24,7 @@ Version1@([FileSystemKey]/home/fileA)
 
 Bitcoin-IBE can derive child public key from parent public key without knowing parent/child private key, while Bitcoin-IBE derive coordinated child private key with master private key, with same ASCII string.
 
-NOTE: It's an IBE-like method, but not as secure as IBE. Child Private Key Deriving is reversible if others know Father Public Key, Child Private Key and ID. You should keep all private keys secret and never expose any of them. (or keep ID secret)
+NOTE: It's an IBE-like method, but not as secure as IBE. Child Private Key Deriving is reversible if others know `Parent Public Key`, `Child Private Key` and `ID`. You should keep all private keys secret and never expose any of them. (or keep `ID` secret)
 
 #### ID-Based Encryption on secp256k1
 
@@ -195,7 +195,7 @@ console.log("Bob can take the money now.")
 
 #### IBE Key URI
 
-The Bitcoin IBE child key should be specified as 
+It's recommanded that Bitcoin-IBE child key be specified as 
 
 ~~~
 [ASCII_String]@[ParentKey]
