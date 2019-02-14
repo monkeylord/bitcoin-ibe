@@ -1,10 +1,10 @@
-# SECURITY CONCERN: CHILD KEY DERIVING IS REVERSABLE, YOU SHOULD NOT EXPOSE ANY OF YOUR PRIVATE KEY
+# SECURITY CONCERN: CHILD PRIVATE KEY DERIVING IS REVERSABLE, YOU SHOULD NOT EXPOSE ANY OF YOUR PRIVATE KEY
 # Bitcoin-IBE
 Bitcoin ID-Based Encryption
 
 Derive Child Keys from Parent Keys and ASCII string.
 
-It's not exactly the IBE, but is IBE-like and useful in child key deriving.
+It's not exactly the IBE in pairing cryptography, but is IBE-like and useful in child key deriving.
 
 ### What IBE do in Bitcoin
 
@@ -28,11 +28,7 @@ NOTE: It's an IBE-like method, but not as secure as IBE. Child Private Key Deriv
 
 #### ID-Based Encryption on secp256k1
 
-A real IBE JS implement, with which you can play as PKG.
-
-Though an IBE-PrivateKey cannot be used as bitcoin address, it's good for encryption/decryption.
-
-Still building.
+It's hard to find a bilinear pairing on secp256k1, PR welcomed if you can build one.
 
 #### Anonymous Transaction
 
@@ -54,6 +50,50 @@ As Bob's Public Key is never revealed, Alice can send multiple transactions to d
 
 Bob's public key can be used multiple times by Alice, while Bob can unlock transactions.
 
+The security concern here is reusing private key, it may be possible to extract master private key from child keys' signatures when using a faulty random number generator.
+
+So if Bob want to spend those transactions, it's recommanded that bob spent all transactions once, and change his public key.
+
+#### Anonymous Communication with ECIES
+
+With help of ECIES, anonymous communication is enabled.
+
+Alice knows Bob's Identity Public Key(IPK), which is used in ECIES, and never used to sign.
+
+> Alice generate a alice session key, then send alice session public key to Bob's IPK address, encrypted with ECIES.
+> Bob decrypt the session public key, and derive multiple child public keys (from child key '1' to 'n') from it as communication address.
+> Bob generate a bob session key, then send Bob session public key to alice_session_public_key.childKey('0').address, encrypted with ECIES.
+> Now both Alice and Bob can send messages to each other, without revealing who the messages are sending to.
+
+Alice can also negociate sessions with Bob_IPK.childKey('Secret only shared between Alice and Bob'), which initiate hidden session.
+
+#### Public Indentity with Certificate
+
+As far as we know, ECDSA signature's security may be weaken by reusing. Child key derivation won't mitigate this.
+
+Besides, public key can be extracted from ECDSA signature, which will reveal signer's identity to the public(Sometimes you don't want to let everyone know) when signature goes public.
+
+So if you want to post something on chain publicly with your signature, it's safer to use a certificate which enable you with non-ECDSA signature.
+
+> You have an Indentity Key.
+> You sign a certificate with it, and public it(or it's signature) on chain with the Indentity Public Key(IPK).
+> You sign a message(a blog maybe) with certificate, and post the message and signature to IPK.childKey('Shared Secret like "blog"').childKey('1').address
+> Now anyone who knows the 'Shared Secret' and your certificate can locate your message and verify it.
+
+As you only sign once, there won't be reusing problem.
+
+In this scenerio, your public keys on blockchain are used as address, and address only. (You can attach a donation address to your blog if you want some)
+
+#### Public Indentity with Pairing-Based IBE(The real one)
+
+Just the same with `Public Indentity with Certificate`, but certificate is replaced with public parameters of pairing-based IBE.
+
+> You have an Indentity Key.
+> You sign a set of public parameters with Indentity Key, and public it on chain with the Indentity Public Key(IPK).
+> You sign a message(a blog maybe) with IBEKEY('Shared Secret like "blog"'||'1'), and post the message and signature to IPK.childKey('Shared Secret like "blog"').childKey('1').address
+> Now anyone who knows the 'Shared Secret' can locate your message and verify it.
+
+In this scenerio, you are actually playing PKG(for youself in this case), it's possible to use all IBE tricks, while child key derivation provide addresses for the same ID.
 
 ### Install
 
