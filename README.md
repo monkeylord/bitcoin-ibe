@@ -115,50 +115,73 @@ npm install bitcoin-ibe
 First, we have a master key pair.
 
 ~~~javascript
-var bsv = require("bsv");
+var bsv = require("bsv")
 
-var parentPrivateKey = new bsv.PrivateKey();
+var parentPrivateKey = new bsv.PrivateKey()
 //<PrivateKey: 93bfa48ea502c4e52d471bb59704162f35dcfa48822c6af81ff94de9567496ec, network: livenet>
-var parentPublicKey = parentPrivateKey.toPublicKey();
-//<PublicKey: 030aed0a4592715acd59bec6c4311fae0eb6465f23eca7c0fdf0cdac50f5a36b9f>
+var parentPublicKey = parentPrivateKey.publicKey
+//<PublicKey: 02033cf62f21f8cf870c310588de1ac018c042e329cd89b05cbb3cee0761fb5ee2>
 ~~~
 
 #### Derive Public Key with Parent Public Key
 
 ~~~javascript
-var ibe = require("bitcoin-ibe");
+var ibe = require("bitcoin-ibe")
 
-var id = "Some_ASCII_String";
-var childPublicKey = ibe.CKDpub(parentPublicKey,id);
-//<PublicKey: 03f9b7bd8cde33f80acbfa49c7d133fe2901450fe5a97ac505c816ae6ee1dd6be1>
+var id = "Some_ASCII_String"
+var childPublicKey = ibe.CKDpub(parentPublicKey,id)
+//<PublicKey: 0250c3b6dbb036daca803fa3b0a7b2def581b5a9d4234238915647aa0f2e6009da>
 
 //Or use integrated way.
-var childPublicKey = parentPublicKey.childKey(id);
+var childPublicKey = parentPublicKey.childKey(id)
 
 ~~~
 
 #### Derive Private Key with Parent Private Key
 
 ~~~javascript
-var ibe = require("bitcoin-ibe");
+var ibe = require("bitcoin-ibe")
 
-var id = "Some_ASCII_String";
-var childPrivateKey = ibe.CKDpriv(parentPrivateKey,id);
-//<PrivateKey: 38cd7085f4d645ec5655b3af75f022619abfcba4e96b231fca7ea907f5586aa7, network: livenet>
+var id = "Some_ASCII_String"
+var childPrivateKey = ibe.CKDpriv(parentPrivateKey,id)
+//<PrivateKey: 2d2a6cd2307f62aa22c8e141e88f2b3c42917aa6c4f6197db0c8240f57955bab, network: livenet>
 
 //Or use integrated way.
-var childPrivateKey = parentPrivateKey.childKey(id);
+var childPrivateKey = parentPrivateKey.childKey(id)
 
 //The Derived child Private/Public Key are also pair.
 childPrivateKey.toPublicKey()
-//<PublicKey: 03f9b7bd8cde33f80acbfa49c7d133fe2901450fe5a97ac505c816ae6ee1dd6be1>
+//<PublicKey: 0250c3b6dbb036daca803fa3b0a7b2def581b5a9d4234238915647aa0f2e6009da>
+~~~
+
+#### Hardened Derivation
+
+```javascript
+var ibe = require("bitcoin-ibe")
+
+var id = "Some_ASCII_String"
+var childPrivateKey = ibe.CKDpriv(parentPrivateKey,id,true)
+//<PrivateKey: cbd0b142740e6afce283703dfe051e4a38d02493523ba97f9801e58de6461025, network: livenet>
+
+//Or use integrated way.
+var childPrivateKey = parentPrivateKey.childKey(id,true)
+```
+
+#### Use Multiplication
+
+~~~javascript
+var childPrivateKey = parentPrivateKey.childKey_mul(id)
 ~~~
 
 ### Specification: Key Derivation
 
-Bitcoin IBE Key Derivation is a variant of ECDH, where ID-generated shared secret play as child PublicKey.
+There are two ways to derive child key.
 
-#### Derive Public Key with Parent Public Key
+#### Multiplication
+
+In Multiplication way, derivation is a variant of ECDH, where ID-generated shared secret play as child PublicKey.
+
+##### Derive Public Key with Parent Public Key
 
 The IBE-like Child Public Key is derived in following step:
 
@@ -166,7 +189,7 @@ The IBE-like Child Public Key is derived in following step:
 2. Let BN = HMAC-SHA256(serialized_PublicKey, serialized_id).
 3. The returned public key = PublicKey.fromPoint(PublicKey * BN)
 
-#### Derive Private Key with Parent Private Key
+##### Derive Private Key with Parent Private Key
 
 The IBE-like Child Private Key is derived in following step:
 
@@ -174,6 +197,33 @@ The IBE-like Child Private Key is derived in following step:
 2. ID and PublicKey are serialized.
 3. Let BN = HMAC-SHA512(serialized_PublicKey, serialized_id).
 4. The returned private key = (BN * PrivateKey) mod N
+
+#### Addition
+
+Addition is a variant of BIP-32
+
+##### Derive Public Key with Parent Public Key
+
+The IBE-like Child Public Key is derived in following step:
+
+1. ID and PublicKey are serialized.
+2. Let BN = HMAC-SHA256(serialized_PublicKey, serialized_id).
+3. The returned public key = PublicKey + BN * G
+4. In case returned public key is invalid, one should append 0x00 to serialized_id and proceed again.
+
+##### Derive Private Key with Parent Private Key
+
+The IBE-like Child Private Key is derived in following step:
+
+1. Get PublicKey from PrivateKey.
+2. ID and PublicKey are serialized.
+3. Let BN = HMAC-SHA256(serialized_PublicKey, serialized_id).
+4. The returned private key = (PrivateKey + BN) mod N
+5. In case returned private key is invalid, one should append 0x00 to serialized_id and proceed again.
+
+#### Hardened Child Key Derivation
+
+Replace serialized_PublicKey with serialized_PrivateKey
 
 #### Demo
 
